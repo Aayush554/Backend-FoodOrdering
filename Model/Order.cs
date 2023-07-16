@@ -19,6 +19,9 @@ namespace FoodOrderingApi.Model
         public int? CartId { get; set; }
         public Cart? Cart { get; set; }
 
+        public double TotalPrice { get; set; }
+
+
     }
 
 }
