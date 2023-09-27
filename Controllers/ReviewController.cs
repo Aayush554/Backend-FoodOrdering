@@ -21,6 +21,22 @@ namespace FoodOrderingApi.Controllers
             _userRepository = userRepository;
             _reviewRepository = reviewRepository;
         }
+
+        /*
+         NAME
+
+            GetReviews - Retrieve a list of reviews.
+
+         DESCRIPTION
+
+            This method retrieves a list of reviews and returns a 200 OK response if successful.
+            It returns a 400 Bad Request response if there is an issue with the ModelState.
+
+         RETURNS
+
+            Returns a 200 OK response with a list of reviews if successful.
+            Returns a 400 Bad Request response if there is an issue with the ModelState.
+         */
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Review>))]
         public IActionResult GetReviews()
@@ -31,6 +47,27 @@ namespace FoodOrderingApi.Controllers
 
             return Ok(reviews);
         }
+
+        /*
+         NAME
+
+            GetReviewByMenuItem - Retrieve a review for a specific menu item.
+
+         DESCRIPTION
+
+            This method retrieves a review for a specific menu item by its ID and returns a 200 OK response if found.
+            It returns a 400 Bad Request response if there is an issue with the ModelState or a 404 Not Found response if the review does not exist.
+
+         PARAMETERS
+
+            menuItemId - An integer representing the menu item's ID.
+
+         RETURNS
+
+            Returns a 200 OK response with the review (decimal) if found.
+            Returns a 400 Bad Request response if there is an issue with the ModelState.
+            Returns a 404 Not Found response if the review does not exist.
+         */
         [HttpGet("{menuItemId}/review")]
         [ProducesResponseType(200, Type = typeof(decimal))]
         [ProducesResponseType(400)]
@@ -47,6 +84,26 @@ namespace FoodOrderingApi.Controllers
             return Ok(reviews);
         }
 
+        /*
+         NAME
+
+            DeleteReview - Delete a review by its ID.
+
+         DESCRIPTION
+
+            This method deletes a review by its ID and returns a 204 No Content response if successful.
+            It returns a 400 Bad Request response if there is an issue with the ModelState or a 404 Not Found response if the review does not exist.
+
+         PARAMETERS
+
+            reviewId - An integer representing the review's ID.
+
+         RETURNS
+
+            Returns a 204 No Content response if the review is successfully deleted.
+            Returns a 400 Bad Request response if there is an issue with the ModelState.
+            Returns a 404 Not Found response if the review does not exist.
+         */
         [HttpDelete("{reviewId}/deleteReview")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
@@ -70,6 +127,27 @@ namespace FoodOrderingApi.Controllers
 
             return NoContent();
         }
+
+        /*
+         NAME
+
+            DeleteALLReviewS - Delete all reviews for a user.
+
+         DESCRIPTION
+
+            This method deletes all reviews for a user by their ID and returns a 204 No Content response if successful.
+            It returns a 400 Bad Request response if there is an issue with the ModelState or a 404 Not Found response if the user does not exist.
+
+         PARAMETERS
+
+            userId - An integer representing the user's ID.
+
+         RETURNS
+
+            Returns a 204 No Content response if all reviews for the user are successfully deleted.
+            Returns a 400 Bad Request response if there is an issue with the ModelState.
+            Returns a 404 Not Found response if the user does not exist.
+         */
         [HttpDelete("{userId}/deleteReviews")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
@@ -93,6 +171,30 @@ namespace FoodOrderingApi.Controllers
 
             return NoContent();
         }
+
+        /*
+         NAME
+
+            UpdateReview - Update a review.
+
+         DESCRIPTION
+
+            This method updates a review based on the provided ReviewDto object and user and menu item IDs.
+            It returns a 204 No Content response if successful, or returns appropriate error responses for validation or server errors.
+
+         PARAMETERS
+
+            menuItemId - An integer representing the menu item's ID.
+            userId - An integer representing the user's ID.
+            updatedReview - A ReviewDto object representing the updated review.
+
+         RETURNS
+
+            Returns a 204 No Content response if the review is successfully updated.
+            Returns a 400 Bad Request response for validation errors.
+            Returns a 404 Not Found response if the review does not exist.
+            Returns a 500 Internal Server Error response for server errors.
+         */
         [HttpPut("{userId}/{menuItemId}/updateReviews")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]

@@ -21,20 +21,39 @@ public class CheckoutController : Controller
         _configuration = configuration;
     }
 
+    /*
+      NAME
+
+      IActionResult::CheckoutOrder - Process the checkout of an order for a list of MenuItems.
+
+      SYNOPSIS
+
+      public async Task<IActionResult> CheckoutOrder([FromBody] MenuItemDto[] products)
+
+      DESCRIPTION
+
+      This asynchronous function handles the checkout process for a list of MenuItems.
+      It calculates the total order amount, sets up payment using Stripe, and returns a client secret for payment.
+
+      PARAMETERS
+
+      [FromBody] MenuItemDto[] products - An array of MenuItemDto objects representing the selected MenuItems.
+
+      RETURNS
+
+      Returns an Ok response with a JSON object containing the ClientSecret for payment if successful.
+      Returns a BadRequest response with an error message if an exception occurs during the checkout process.
+  */
     [HttpPost("checkout")]
     public async Task<IActionResult> CheckoutOrder([FromBody] MenuItemDto[] products)
     {
         try
         {
-
             decimal totalPrice = CalculateOrderAmount(products) * 100;
 
             var taxPrice = 0;
             var shippingPrice = 0;
 
-            // Save the order to the database if needed
-            // need to update a lot in the database
-            // need to create a  user eith related cart and related 
 
             StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
             var options = new PaymentIntentCreateOptions
@@ -53,6 +72,27 @@ public class CheckoutController : Controller
         }
     }
 
+    /*
+        NAME
+
+        CalculateOrderAmount - Calculate the total order amount based on selected MenuItems.
+
+        SYNOPSIS
+
+        private decimal CalculateOrderAmount(MenuItemDto[] products)
+
+        DESCRIPTION
+
+        This private function calculates the total order amount based on the prices of the selected MenuItems.
+
+        PARAMETERS
+
+        MenuItemDto[] products - An array of MenuItemDto objects representing the selected MenuItems.
+
+        RETURNS
+
+        Returns the total order amount as a decimal.
+    */
     private decimal CalculateOrderAmount(MenuItemDto[] products)
     {
         decimal total = 0;

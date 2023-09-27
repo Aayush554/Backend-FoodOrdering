@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FoodOrderingApi.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -69,21 +69,20 @@ namespace FoodOrderingApi.Migrations
                 name: "CartItems",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CartId = table.Column<int>(type: "int", nullable: true),
-                    MenuItemId = table.Column<int>(type: "int", nullable: true),
+                    CartId = table.Column<int>(type: "int", nullable: false),
+                    MenuItemId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: true),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CartItems", x => x.Id);
+                    table.PrimaryKey("PK_CartItems", x => new { x.CartId, x.MenuItemId });
                     table.ForeignKey(
                         name: "FK_CartItems_MenuItems_MenuItemId",
                         column: x => x.MenuItemId,
                         principalTable: "MenuItems",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -113,11 +112,9 @@ namespace FoodOrderingApi.Migrations
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PostCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FlexDollars = table.Column<int>(type: "int", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    OrderId = table.Column<int>(type: "int", nullable: true),
-                    ReviewId = table.Column<int>(type: "int", nullable: true),
-                    CartId = table.Column<int>(type: "int", nullable: true),
-                    PaymentId = table.Column<int>(type: "int", nullable: true)
+                    CartId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -140,11 +137,17 @@ namespace FoodOrderingApi.Migrations
                     ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CVV = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: true),
-                    OrderId = table.Column<int>(type: "int", nullable: false)
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    Payment = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Payment", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Payment_Users_Payment",
+                        column: x => x.Payment,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Payment_Users_UserId",
                         column: x => x.UserId,
@@ -162,7 +165,8 @@ namespace FoodOrderingApi.Migrations
                     ReviewMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ReviewDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     MenuItemId = table.Column<int>(type: "int", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    Review = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -171,6 +175,11 @@ namespace FoodOrderingApi.Migrations
                         name: "FK_Reviews_MenuItems_MenuItemId",
                         column: x => x.MenuItemId,
                         principalTable: "MenuItems",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Reviews_Users_Review",
+                        column: x => x.Review,
+                        principalTable: "Users",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Reviews_Users_UserId",
@@ -188,7 +197,9 @@ namespace FoodOrderingApi.Migrations
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PaymentId = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: true),
-                    CartId = table.Column<int>(type: "int", nullable: true)
+                    CartId = table.Column<int>(type: "int", nullable: true),
+                    TotalPrice = table.Column<double>(type: "float", nullable: false),
+                    Order = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -204,16 +215,16 @@ namespace FoodOrderingApi.Migrations
                         principalTable: "Payment",
                         principalColumn: "Id");
                     table.ForeignKey(
+                        name: "FK_Orders_Users_Order",
+                        column: x => x.Order,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_Orders_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CartItems_CartId",
-                table: "CartItems",
-                column: "CartId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CartItems_MenuItemId",
@@ -236,6 +247,11 @@ namespace FoodOrderingApi.Migrations
                 column: "CartId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_Order",
+                table: "Orders",
+                column: "Order");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orders_PaymentId",
                 table: "Orders",
                 column: "PaymentId");
@@ -246,6 +262,11 @@ namespace FoodOrderingApi.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Payment_Payment",
+                table: "Payment",
+                column: "Payment");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Payment_UserId",
                 table: "Payment",
                 column: "UserId");
@@ -254,6 +275,11 @@ namespace FoodOrderingApi.Migrations
                 name: "IX_Reviews_MenuItemId",
                 table: "Reviews",
                 column: "MenuItemId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_Review",
+                table: "Reviews",
+                column: "Review");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reviews_UserId",
@@ -270,7 +296,8 @@ namespace FoodOrderingApi.Migrations
                 table: "CartItems",
                 column: "CartId",
                 principalTable: "Carts",
-                principalColumn: "Id");
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Carts_Users_UserId",
